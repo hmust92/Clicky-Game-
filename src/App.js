@@ -8,8 +8,53 @@ import "./App.css";
 class App extends Component {
   // Setting this.state.friends to the friends json array
   state = {
-    friends
+        message: "Click an image to begin!",
+        topScore: 0,
+        currentScore: 0,
+        friends: friends,
+        unselectedFriends: friends
   };
+
+  componentDidMount() {
+    }
+
+    shuffleArray = array => {
+        for (let i = array.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+        selectFriend = name => {
+        const findFriend = this.state.unselectedFriends.find(item => item.name === name);
+
+        if(findFriend === undefined) {
+            // failure to select a new dog
+            this.setState({ 
+                message: "You guessed incorrectly!",
+                topScore: (this.state.currentScore > this.state.topScore) ? this.state.currentScore : this.state.topScore,
+                currentScore: 0,
+                friends: friends,
+                unselectedFriends: friends
+            });
+        }
+        else {
+            // success to select a new dog
+            const newFriend = this.state.unselectedFriends.filter(item => item.name !== name);
+            
+            this.setState({ 
+                message: "You guessed correctly!",
+                currentScore: this.state.currentScore + 1,
+                friends: friends,
+                unselectedFriends: newFriend
+            });
+        }
+
+        this.shuffleArray(friends);
+    };
+
+
+
 
 
 
@@ -17,14 +62,16 @@ class App extends Component {
   render() {
     return (
       <Wrapper>
-       <Navbar homeLink="#" currentScore={1} topScore={2} /> 
+       <Navbar homeLink="/" message={this.state.message} currentScore={this.state.currentScore} topScore={this.state.topScore} /> 
 
         {this.state.friends.map(friend => (
           <FriendCard
-            id={friend.id}
-            key={friend.id}
 
+            name = {friend.name}
             image={friend.image}
+            selectFriend={this.selectFriend}
+            currentScore={this.state.currentScore}
+            
  
           />
         ))}
